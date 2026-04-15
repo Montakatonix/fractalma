@@ -674,7 +674,18 @@ function FAQ() {
 /* ════════════════════════════════════════════════════
    CUESTIONARIO
 ════════════════════════════════════════════════════ */
+/* ── Pattern options for step 1 ── */
+const PATRONES = [
+  { id:"rel",  label:"Relaciones", desc:"Vínculos que se repiten, dependencia, conflicto" },
+  { id:"emo",  label:"Emociones bloqueadas", desc:"Ansiedad, tristeza, rabia que no se va" },
+  { id:"dec",  label:"Decisiones y bloqueos", desc:"Procrastinación, miedo a decidir, autoboicot" },
+  { id:"id",   label:"Identidad y valía", desc:"Sensación de no ser suficiente, comparación constante" },
+  { id:"pro",  label:"Trabajo y propósito", desc:"Insatisfacción, no encontrar dirección, estancamiento" },
+  { id:"cue",  label:"Cuerpo y energía", desc:"Tensión crónica, agotamiento, desconexión corporal" },
+];
+
 function Cuestionario() {
+  const TOTAL_STEPS = 3;
   const [step,setStep]=useState(0);
   const [loading,setLoading]=useState(false);
   const [success,setSuccess]=useState(false);
@@ -682,17 +693,29 @@ function Cuestionario() {
   const [form,setForm]=useState({
     full_name:"",email:"",phone:"",current_situation:"",
     repeated_patterns:"",what_have_they_tried:"",
-    what_do_they_want:"",readiness_level:5,extra_notes:"",
+    what_do_they_want:"",readiness_level:5,
   });
+  const [selectedPatterns,setSelectedPatterns]=useState<string[]>([]);
   const upd=(k:string,v:string|number)=>setForm(f=>({...f,[k]:v}));
+
+  const togglePattern=(id:string)=>{
+    setSelectedPatterns(prev=>
+      prev.includes(id) ? prev.filter(p=>p!==id) : [...prev,id]
+    );
+  };
+
+  const pct = Math.round(((step) / TOTAL_STEPS) * 100);
 
   const handleSubmit=async()=>{
     setLoading(true);setError("");
     try{
+      const patternsText = selectedPatterns
+        .map(id=>PATRONES.find(p=>p.id===id)?.label||id)
+        .join(", ");
       const{error:e}=await supabase.from("questionnaire_submissions").insert([{
         full_name:form.full_name,email:form.email,phone:form.phone||null,
         current_situation:form.current_situation||null,
-        repeated_patterns:form.repeated_patterns||null,
+        repeated_patterns:patternsText||null,
         what_have_they_tried:form.what_have_they_tried||null,
         what_do_they_want:form.what_do_they_want||null,
         readiness_level:form.readiness_level,
@@ -708,6 +731,19 @@ function Cuestionario() {
       setError("Algo ha fallado. Por favor, inténtalo de nuevo.");
     }finally{setLoading(false);}
   };
+
+  const canAdvance = ()=>{
+    if(step===0) return form.current_situation.trim().length > 0;
+    if(step===1) return selectedPatterns.length > 0;
+    if(step===2) return form.full_name.trim() && form.email.trim();
+    return true;
+  };
+
+  const stepTitles = [
+    "¿Qué está pasando?",
+    "¿Qué patrones reconoces?",
+    "Para estar en contacto",
+  ];
 
   return (
     <section id="cuestionario" style={{padding:"120px 0",
@@ -731,10 +767,10 @@ function Cuestionario() {
           {success ? (
             <div style={{padding:"48px",background:"var(--ivory)",borderRadius:"16px",
               border:"1px solid var(--border)",textAlign:"center",boxShadow:"var(--shadow-md)"}}>
-              <div style={{width:"48px",height:"48px",borderRadius:"50%",
+              <div style={{width:"56px",height:"56px",borderRadius:"50%",
                 background:"var(--sage-soft)",border:"2px solid var(--sage)",
                 display:"flex",alignItems:"center",justifyContent:"center",
-                margin:"0 auto 24px",fontSize:"1.25rem",color:"var(--sage-deep)"}}>✓</div>
+                margin:"0 auto 24px",fontSize:"1.375rem",color:"var(--sage-deep)"}}>✓</div>
               <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
                 fontSize:"2rem",color:"var(--moss)",marginBottom:"12px"}}>Recibido.</p>
               <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:".9375rem",fontWeight:300,
@@ -748,19 +784,111 @@ function Cuestionario() {
           ) : (
             <div style={{background:"var(--ivory)",borderRadius:"16px",
               border:"1px solid var(--border)",padding:"48px",boxShadow:"var(--shadow-sm)"}}>
-              {/* Progress */}
-              <div style={{display:"flex",gap:"6px",marginBottom:"40px"}}>
-                {[0,1,2].map(i=>(
-                  <motion.div key={i}
-                    animate={{background: i<=step ? "var(--sage)" : "var(--sand-2)"}}
-                    style={{flex:1,height:"3px",borderRadius:"2px",transition:"background .3s"}}/>
-                ))}
+
+              {/* ── Barra de progreso con porcentaje ── */}
+              <div style={{marginBottom:"36px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",
+                  alignItems:"center",marginBottom:"10px"}}>
+                  <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:".75rem",
+                    letterSpacing:".1em",textTransform:"uppercase",color:"var(--text-3)"}}>
+                    Paso {step+1} de {TOTAL_STEPS}
+                  </span>
+                  <motion.span
+                    key={pct}
+                    initial={{opacity:0,y:-6}} animate={{opacity:1,y:0}}
+                    transition={{duration:.3}}
+                    style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
+                      fontSize:"1.125rem",fontWeight:400,color:"var(--sage-deep)"}}>
+                    {pct}%
+                  </motion.span>
+                </div>
+                <div style={{width:"100%",height:"4px",background:"var(--sand-2)",
+                  borderRadius:"2px",overflow:"hidden"}}>
+                  <motion.div
+                    initial={{width:"0%"}}
+                    animate={{width:`${pct}%`}}
+                    transition={{duration:.5,ease:"easeOut"}}
+                    style={{height:"100%",background:
+                      "linear-gradient(90deg, var(--sage) 0%, var(--moss) 100%)",
+                      borderRadius:"2px"}}/>
+                </div>
               </div>
+
               <h3 style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
                 fontSize:"1.625rem",fontWeight:400,color:"var(--text)",marginBottom:"32px"}}>
-                {["¿Quién eres?","¿Qué estás viviendo?","Tu camino hasta aquí"][step]}
+                {stepTitles[step]}
               </h3>
+
+              {/* ── PASO 0: situación actual (texto libre) ── */}
               {step===0&&(
+                <div style={{display:"flex",flexDirection:"column",gap:"20px"}}>
+                  <div>
+                    <label className="lbl">¿Qué está pasando en tu vida ahora mismo?</label>
+                    <textarea className="inp" value={form.current_situation}
+                      onChange={e=>upd("current_situation",e.target.value)}
+                      placeholder="Describe brevemente tu situación actual..."
+                      style={{minHeight:"130px",resize:"vertical"}}/>
+                  </div>
+                  <div>
+                    <label className="lbl">¿Qué quieres que cambie realmente?</label>
+                    <textarea className="inp" value={form.what_do_they_want}
+                      onChange={e=>upd("what_do_they_want",e.target.value)}
+                      placeholder="Lo que sueñas que sea diferente..."
+                      style={{minHeight:"100px",resize:"vertical"}}/>
+                  </div>
+                </div>
+              )}
+
+              {/* ── PASO 1: patrones como test visual (selección múltiple) ── */}
+              {step===1&&(
+                <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
+                  <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:".875rem",
+                    fontWeight:300,color:"var(--text-3)",marginBottom:"8px"}}>
+                    Selecciona los que reconoces (puedes elegir varios)
+                  </p>
+                  {PATRONES.map(p=>{
+                    const sel = selectedPatterns.includes(p.id);
+                    return (
+                      <motion.button key={p.id}
+                        onClick={()=>togglePattern(p.id)}
+                        whileHover={{scale:1.01}}
+                        whileTap={{scale:.99}}
+                        style={{
+                          width:"100%",textAlign:"left",padding:"16px 20px",
+                          background: sel ? "var(--sage-soft)" : "var(--ivory-2)",
+                          border: sel ? "1.5px solid var(--sage)" : "1.5px solid var(--border-2)",
+                          borderRadius:"8px",cursor:"pointer",
+                          transition:"all .2s",
+                          display:"flex",alignItems:"center",gap:"16px",
+                        }}>
+                        <div style={{
+                          width:"20px",height:"20px",borderRadius:"50%",flexShrink:0,
+                          border: sel ? "2px solid var(--sage)" : "2px solid var(--border-2)",
+                          background: sel ? "var(--sage)" : "transparent",
+                          display:"flex",alignItems:"center",justifyContent:"center",
+                          transition:"all .2s",
+                        }}>
+                          {sel && <span style={{color:"#fff",fontSize:".625rem",lineHeight:1}}>✓</span>}
+                        </div>
+                        <div>
+                          <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:".9375rem",
+                            fontWeight:sel?400:300,color:"var(--text)",marginBottom:"2px",
+                            transition:"font-weight .1s"}}>
+                            {p.label}
+                          </p>
+                          <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:".8125rem",
+                            fontWeight:300,color:"var(--text-3)",lineHeight:1.4}}>
+                            {p.desc}
+                          </p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ── PASO 2: datos personales + contexto ── */}
+              {step===2&&(
                 <div style={{display:"flex",flexDirection:"column",gap:"20px"}}>
                   <div><label className="lbl">Nombre completo *</label>
                     <input className="inp" value={form.full_name}
@@ -771,34 +899,6 @@ function Cuestionario() {
                   <div><label className="lbl">Teléfono (opcional)</label>
                     <input className="inp" value={form.phone}
                       onChange={e=>upd("phone",e.target.value)} placeholder="+34 600 000 000"/></div>
-                </div>
-              )}
-              {step===1&&(
-                <div style={{display:"flex",flexDirection:"column",gap:"20px"}}>
-                  <div><label className="lbl">¿Qué está pasando en tu vida ahora mismo?</label>
-                    <textarea className="inp" value={form.current_situation}
-                      onChange={e=>upd("current_situation",e.target.value)}
-                      placeholder="Describe brevemente tu situación actual..."
-                      style={{minHeight:"110px",resize:"vertical"}}/></div>
-                  <div><label className="lbl">¿Qué patrones sientes que se repiten?</label>
-                    <textarea className="inp" value={form.repeated_patterns}
-                      onChange={e=>upd("repeated_patterns",e.target.value)}
-                      placeholder="Relaciones, decisiones, emociones que vuelven..."
-                      style={{minHeight:"110px",resize:"vertical"}}/></div>
-                </div>
-              )}
-              {step===2&&(
-                <div style={{display:"flex",flexDirection:"column",gap:"20px"}}>
-                  <div><label className="lbl">¿Qué has intentado antes?</label>
-                    <textarea className="inp" value={form.what_have_they_tried}
-                      onChange={e=>upd("what_have_they_tried",e.target.value)}
-                      placeholder="Terapia, cursos, lecturas, herramientas..."
-                      style={{minHeight:"90px",resize:"vertical"}}/></div>
-                  <div><label className="lbl">¿Qué quieres que cambie realmente?</label>
-                    <textarea className="inp" value={form.what_do_they_want}
-                      onChange={e=>upd("what_do_they_want",e.target.value)}
-                      placeholder="Lo que sueñas que sea diferente..."
-                      style={{minHeight:"90px",resize:"vertical"}}/></div>
                   <div>
                     <label className="lbl">¿Cuánto estás dispuesto/a a mirarte de verdad? (1–10)</label>
                     <div style={{display:"flex",alignItems:"center",gap:"16px",marginTop:"10px"}}>
@@ -812,8 +912,10 @@ function Cuestionario() {
                   </div>
                 </div>
               )}
+
               {error&&<p style={{marginTop:"16px",color:"#b05a45",fontFamily:"'DM Sans',sans-serif",
                 fontSize:".875rem"}}>{error}</p>}
+
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:"40px"}}>
                 {step>0
                   ? <button onClick={()=>setStep(s=>s-1)}
@@ -826,17 +928,19 @@ function Cuestionario() {
                     </button>
                   : <div/>
                 }
-                {step===2
-                  ? <button onClick={handleSubmit} disabled={loading} className="btn-p"
-                      style={{opacity:loading?.65:1}}>
+                {step===TOTAL_STEPS-1
+                  ? <button onClick={handleSubmit} disabled={loading||!canAdvance()} className="btn-p"
+                      style={{opacity:(loading||!canAdvance())?.65:1}}>
                       {loading ? "Enviando…" : "Enviar cuestionario"}
                     </button>
-                  : <button onClick={()=>{
-                        if(step===0&&(!form.full_name.trim()||!form.email.trim()))return;
-                        setStep(s=>s+1);
-                      }} className="btn-p">
+                  : <motion.button
+                      onClick={()=>{ if(canAdvance()) setStep(s=>s+1); }}
+                      className="btn-p"
+                      style={{opacity:canAdvance()?1:.55,cursor:canAdvance()?"pointer":"not-allowed"}}
+                      whileHover={canAdvance()?{scale:1.02}:{}}
+                      whileTap={canAdvance()?{scale:.98}:{}}>
                       Siguiente →
-                    </button>
+                    </motion.button>
                 }
               </div>
             </div>
