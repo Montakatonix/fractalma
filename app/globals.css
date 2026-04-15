@@ -2,28 +2,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
 
 :root {
-  --bg: #0c0b09;
-  --surface: #1a1712;
-  --border: rgba(212, 196, 158, 0.1);
-  --border-strong: rgba(212, 196, 158, 0.22);
-  --gold: #c9a96e;
-  --gold-muted: rgba(201, 169, 110, 0.45);
-  --text: #e8e0d0;
-  --text-muted: #9a9080;
-  --text-dim: #5a5548;
-  --white: #f5f0e8;
+  /* ── Paleta luminosa FRACTALMA ── */
+  --ivory:     #faf8f4;       /* fondo principal */
+  --ivory-2:   #f5f1ea;       /* fondo alterno */
+  --sand:      #ede8de;       /* secciones intermedias */
+  --sand-2:    #e4ddd0;       /* bordes visibles */
+  --sage:      #7d9b7a;       /* verde salvia — color de marca */
+  --sage-deep: #5a7557;       /* verde profundo para hover */
+  --sage-soft: rgba(125,155,122,.12); /* sage translúcido */
+  --moss:      #4a6347;       /* acento oscuro verde */
+  --text:      #2d2b27;       /* texto principal — no negro puro */
+  --text-2:    #5a5650;       /* texto secundario */
+  --text-3:    #9a948c;       /* texto muted */
+  --border:    rgba(90,86,80,.1);
+  --border-2:  rgba(90,86,80,.18);
+  --white:     #ffffff;
+  --shadow-sm: 0 2px 12px rgba(45,43,39,.06);
+  --shadow-md: 0 8px 32px rgba(45,43,39,.1);
+  --shadow-lg: 0 24px 64px rgba(45,43,39,.12);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+
 body {
-  background: var(--bg);
+  background: var(--ivory);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   font-weight: 300;
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--text-dim); }
+
+h1, h2, h3, h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+::selection { background: var(--sage-soft); color: var(--moss); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--ivory); }
+::-webkit-scrollbar-thumb { background: var(--sand-2); border-radius: 2px; }
+
+/* ── Noise texture overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+}
