@@ -30,10 +30,10 @@ const WaIcon = () => (
 const CSS = `
 :root{
   --ivory:#faf8f4;--ivory-2:#f5f1ea;--sand:#ede8de;--sand-2:#e4ddd0;
-  --sage:#7d9b7a;--sage-deep:#5a7557;--sage-soft:rgba(125,155,122,.12);--moss:#4a6347;
-  --text:#2d2b27;--text-2:#5a5650;--text-3:#9a948c;
-  --border:rgba(90,86,80,.1);--border-2:rgba(90,86,80,.18);
-  --shadow-sm:0 2px 12px rgba(45,43,39,.06);--shadow-md:0 8px 32px rgba(45,43,39,.1);
+  --sage:#6d8f6a;--sage-deep:#4a6347;--sage-soft:rgba(109,143,106,.14);--moss:#3a5338;
+  --text:#1e1c19;--text-2:#3d3a35;--text-3:#6b6560;
+  --border:rgba(60,56,50,.1);--border-2:rgba(60,56,50,.2);
+  --shadow-sm:0 2px 12px rgba(30,28,25,.07);--shadow-md:0 8px 32px rgba(30,28,25,.12);
 }
 *{box-sizing:border-box;}
 body{background:var(--ivory);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;
@@ -225,7 +225,7 @@ function SiEstoTeResuena() {
             fontSize:"clamp(2rem,5vw,3.5rem)",fontWeight:300,
             lineHeight:1.15,marginBottom:"64px"}}>
             Si esto te resuena,<br/>
-            <span style={{color:"var(--sage-deep)"}}>estás en el lugar correcto.</span>
+            <span style={{color:"#4a6347"}}>estás en el lugar correcto.</span>
           </h2>
         </Reveal>
         {items.map((item,i)=>(
@@ -287,7 +287,7 @@ function ElProblema() {
                 borderRadius:"2px",marginBottom:"32px"}}/>
               <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
                 fontSize:"1.625rem",fontStyle:"italic",fontWeight:300,
-                color:"var(--text)",lineHeight:1.55,marginBottom:"24px"}}>
+                color:"#1e1c19",lineHeight:1.55,marginBottom:"24px"}}>
                 &ldquo;La vida no repite patrones para castigarte. Los repite para revelarte
                 aquello que necesitas comprender.&rdquo;
               </p>
@@ -315,7 +315,7 @@ function QuEsFractalma() {
           <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
             fontSize:"clamp(3rem,7vw,5.5rem)",fontWeight:300,
             letterSpacing:".04em",marginBottom:"12px",
-            background:"linear-gradient(135deg, var(--moss) 0%, var(--sage) 60%, #a8c4a5 100%)",
+            background:"linear-gradient(135deg, #3a5338 0%, #5a7a57 50%, #7d9b7a 100%)",
             WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
             backgroundClip:"text"}}>
             FRACTALMA
@@ -439,12 +439,12 @@ function LasFases() {
                       {f.t}
                     </h3>
                     <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:".75rem",
-                      letterSpacing:".12em",textTransform:"uppercase",color:f.accent}}>
+                      letterSpacing:".12em",textTransform:"uppercase",color:f.accent,fontWeight:500}}>
                       {f.s}
                     </span>
                   </div>
                   <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:".9375rem",
-                    fontWeight:300,color:"var(--text-2)",lineHeight:1.85,
+                    fontWeight:300,color:"var(--text)",lineHeight:1.85,opacity:.75,
                     maxWidth:"620px"}}>
                     {f.body}
                   </p>
@@ -567,7 +567,7 @@ function Diferencial() {
               <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
                 fontSize:"clamp(2rem,4vw,3rem)",fontWeight:300,lineHeight:1.2}}>
                 El cambio sucede cuando
-                <em style={{display:"block",color:"var(--sage-deep)",fontStyle:"italic",marginTop:"4px"}}>
+                <em style={{display:"block",color:"#4a6347",fontStyle:"italic",marginTop:"4px"}}>
                   se atraviesa
                 </em>
                 lo que está en el fondo.
@@ -897,7 +897,7 @@ function CTAFinal() {
         </Reveal>
         <Reveal delay={.2}>
           <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:"1.0625rem",fontWeight:300,
-            color:"rgba(255,255,255,.75)",lineHeight:1.85,
+            color:"rgba(255,255,255,.92)",lineHeight:1.85,
             marginBottom:"56px",maxWidth:"460px",margin:"0 auto 56px"}}>
             Si algo de lo que has leído aquí te ha movido, ese movimiento
             también es información. Escríbeme.
@@ -918,10 +918,10 @@ function CTAFinal() {
             </a>
             <a href="#cuestionario"
               style={{display:"inline-flex",alignItems:"center",gap:"10px",
-                background:"transparent",color:"#fff",
+                background:"rgba(255,255,255,.12)",color:"#fff",
                 fontFamily:"'DM Sans',sans-serif",fontWeight:400,
                 fontSize:".8125rem",letterSpacing:".06em",textTransform:"uppercase",
-                padding:"15px 31px",border:"1.5px solid rgba(255,255,255,.4)",
+                padding:"15px 31px",border:"1.5px solid rgba(255,255,255,.6)",
                 borderRadius:"2px",textDecoration:"none",transition:"all .25s"}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.8)";e.currentTarget.style.transform="translateY(-2px)";}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.4)";e.currentTarget.style.transform="translateY(0)";}}>
@@ -967,6 +967,36 @@ function Footer() {
   );
 }
 
+
+/* ════════════════════════════════════════════════════
+   FLOATING WHATSAPP
+════════════════════════════════════════════════════ */
+function FloatingWA() {
+  return (
+    <motion.a
+      href={WA}
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 1.5, duration: 0.4 }}
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.95 }}
+      style={{
+        position:"fixed", bottom:"28px", right:"28px", zIndex:200,
+        width:"56px", height:"56px", borderRadius:"50%",
+        background:"var(--sage)", color:"#fff",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        boxShadow:"0 4px 24px rgba(74,99,71,.4)",
+        textDecoration:"none",
+      }}
+      aria-label="Escribir por WhatsApp"
+    >
+      <WaIcon/>
+    </motion.a>
+  );
+}
+
 /* ════════════════════════════════════════════════════
    PAGE
 ════════════════════════════════════════════════════ */
@@ -989,6 +1019,7 @@ export default function Page() {
         <CTAFinal/>
         <Footer/>
       </main>
+      <FloatingWA/>
     </>
   );
 }
