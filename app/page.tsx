@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
@@ -7,17 +7,24 @@ const WA = process.env.NEXT_PUBLIC_WHATSAPP_URL ||
   "https://wa.me/34000000000?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20FRACTALMA";
 
 /* ── Framer helpers ─────────────────────────────── */
-const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => (
-  <motion.div
-    className={className}
-    initial={{ opacity: 0, y: 22 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.1 }}
-    transition={{ duration: 0.65, ease: "easeOut", delay }}
-  >
-    {children}
-  </motion.div>
-);
+const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add("rev-in"); obs.disconnect(); } },
+      { rootMargin: "0px 0px 60px 0px", threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`rev ${className}`} style={{ "--rev-delay": `${delay}s` } as React.CSSProperties}>
+      {children}
+    </div>
+  );
+};
 
 /* ── Icons ──────────────────────────────────────── */
 const WaIcon = () => (
@@ -74,6 +81,12 @@ body{background:var(--ivory);color:var(--text);font-family:'DM Sans',sans-serif;
   box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s;}
 .card:hover{box-shadow:var(--shadow-md);transform:translateY(-4px);}
 
+/* Reveal animations (content visible by default, animates in with JS) */
+.rev{opacity:1;transform:translateY(0);} /* visible without JS */
+@media(prefers-reduced-motion:no-preference){
+  .rev{opacity:0;transform:translateY(18px);transition:opacity .6s ease var(--rev-delay,0s),transform .6s ease var(--rev-delay,0s);}
+  .rev.rev-in{opacity:1;transform:translateY(0);}
+}
 /* Hero CSS animations (SSR-safe) */
 @keyframes heroIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .hero-in{opacity:0;animation:heroIn .75s ease forwards;}
