@@ -1,6 +1,6 @@
 "use client";
-import { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
 const WA = process.env.NEXT_PUBLIC_WHATSAPP_URL ||
@@ -74,6 +74,10 @@ body{background:var(--ivory);color:var(--text);font-family:'DM Sans',sans-serif;
   box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s;}
 .card:hover{box-shadow:var(--shadow-md);transform:translateY(-4px);}
 
+/* Hero CSS animations (SSR-safe) */
+@keyframes heroIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-in{opacity:0;animation:heroIn .75s ease forwards;}
+
 /* Responsive */
 @media(max-width:768px){
   .rg{grid-template-columns:1fr!important;gap:40px!important;}
@@ -120,13 +124,8 @@ function Nav() {
    HERO
 ════════════════════════════════════════════════════ */
 function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start","end start"] });
-  const y = useTransform(scrollYProgress, [0,1], [0, 80]);
-  const opacity = useTransform(scrollYProgress, [0,.7], [1, 0]);
-
   return (
-    <section ref={ref} style={{
+    <section style={{
       minHeight:"100vh",display:"flex",flexDirection:"column",
       justifyContent:"center",alignItems:"center",textAlign:"center",
       padding:"120px 32px 80px",position:"relative",overflow:"hidden",
@@ -151,16 +150,11 @@ function Hero() {
         }}/>
       </div>
 
-      <motion.div style={{ y, opacity, position:"relative" }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0 }}>
+      <div style={{position:"relative"}}>
+        <div className="hero-in" style={{animationDelay:"0.05s"}}>
           <span className="tag">Despertar · Liberar · Reconectar</span>
-        </motion.div>
-
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.18 }}
-          style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
-            fontSize:"clamp(2.8rem,7vw,5.75rem)",fontWeight:300,
-            lineHeight:1.08,color:"var(--text)",marginBottom:"32px",
-            letterSpacing:"-.02em",maxWidth:"860px",margin:"0 auto 32px"}}>
+        </div>
+        <h1 className="hero-in" style={{animationDelay:"0.18s",fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:"clamp(2.8rem,7vw,5.75rem)",fontWeight:300,lineHeight:1.08,color:"var(--text)",letterSpacing:"-.02em",maxWidth:"860px",margin:"0 auto 32px"}}>
           No es tu vida la que se repite.
           <br/>
           <em style={{color:"var(--sage-deep)",fontStyle:"italic"}}>
@@ -168,24 +162,20 @@ function Hero() {
           </em>
           <br/>
           <em style={{color:"var(--sage-deep)",fontStyle:"italic"}}>la estás viviendo.</em>
-        </motion.h1>
+        </h1>
 
-        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.34 }}
-          style={{fontFamily:"'DM Sans',sans-serif",fontSize:"1.0625rem",fontWeight:300,
-            color:"var(--text-2)",maxWidth:"520px",lineHeight:1.85,
-            margin:"0 auto 52px"}}>
+        <p className="hero-in" style={{animationDelay:"0.34s",fontFamily:"DM Sans,sans-serif",fontSize:"1.0625rem",fontWeight:300,color:"var(--text-2)",maxWidth:"520px",lineHeight:1.85,margin:"0 auto 52px"}}>
           Un proceso de acompañamiento profundo para comprender el origen
           de lo que se repite y transformarlo desde dentro.
-        </motion.p>
+        </p>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.5 }}
-          style={{display:"flex",gap:"16px",justifyContent:"center",flexWrap:"wrap"}}>
+        <div className="hero-in" style={{animationDelay:"0.5s",display:"flex",gap:"16px",justifyContent:"center",flexWrap:"wrap"}}>
           <a href={WA} target="_blank" rel="noopener noreferrer" className="btn-p">
             <WaIcon/>Escribir por WhatsApp
           </a>
           <a href="#cuestionario" className="btn-s">Completar cuestionario</a>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Scroll indicator */}
       <motion.div
