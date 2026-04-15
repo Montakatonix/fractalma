@@ -1,25 +1,23 @@
 "use client";
 import { useState, useRef } from "react";
-import { motion, useInView, useScroll, useTransform, type Variants } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
 const WA = process.env.NEXT_PUBLIC_WHATSAPP_URL ||
   "https://wa.me/34000000000?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20FRACTALMA";
 
 /* ── Framer helpers ─────────────────────────────── */
-const stagger = (delay = 0): Variants => ({
-  hidden: { opacity: 0, y: 24 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut", delay } },
-});
-const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return (
-    <motion.div ref={ref} variants={stagger(delay)} initial="hidden" animate={inView ? "show" : "hidden"} className={className}>
-      {children}
-    </motion.div>
-  );
-};
+const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => (
+  <motion.div
+    className={className}
+    initial={{ opacity: 0, y: 22 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.1 }}
+    transition={{ duration: 0.65, ease: "easeOut", delay }}
+  >
+    {children}
+  </motion.div>
+);
 
 /* ── Icons ──────────────────────────────────────── */
 const WaIcon = () => (
@@ -154,11 +152,11 @@ function Hero() {
       </div>
 
       <motion.div style={{ y, opacity, position:"relative" }}>
-        <motion.div variants={stagger(0)} initial="hidden" animate="show">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0 }}>
           <span className="tag">Despertar · Liberar · Reconectar</span>
         </motion.div>
 
-        <motion.h1 variants={stagger(.18)} initial="hidden" animate="show"
+        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.18 }}
           style={{fontFamily:"'Cormorant Garamond',Georgia,serif",
             fontSize:"clamp(2.8rem,7vw,5.75rem)",fontWeight:300,
             lineHeight:1.08,color:"var(--text)",marginBottom:"32px",
@@ -172,7 +170,7 @@ function Hero() {
           <em style={{color:"var(--sage-deep)",fontStyle:"italic"}}>la estás viviendo.</em>
         </motion.h1>
 
-        <motion.p variants={stagger(.34)} initial="hidden" animate="show"
+        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.34 }}
           style={{fontFamily:"'DM Sans',sans-serif",fontSize:"1.0625rem",fontWeight:300,
             color:"var(--text-2)",maxWidth:"520px",lineHeight:1.85,
             margin:"0 auto 52px"}}>
@@ -180,7 +178,7 @@ function Hero() {
           de lo que se repite y transformarlo desde dentro.
         </motion.p>
 
-        <motion.div variants={stagger(.5)} initial="hidden" animate="show"
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: "easeOut", delay: 0.5 }}
           style={{display:"flex",gap:"16px",justifyContent:"center",flexWrap:"wrap"}}>
           <a href={WA} target="_blank" rel="noopener noreferrer" className="btn-p">
             <WaIcon/>Escribir por WhatsApp
